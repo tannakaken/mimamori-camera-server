@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI, UploadFile, HTTPException
 from fastapi.responses import FileResponse
 import os
 import shutil
@@ -16,6 +16,8 @@ JST = timezone(timedelta(hours=+9), 'JST')
 def read_root() -> FileResponse:
     p = Path(dir_path)
     files = list(p.glob("*"))
+    if not files:
+        raise HTTPException(status_code=404, detail="not found")
     file_updates = {file_path: os.stat(file_path).st_mtime for file_path in files}
 
     newest_file_path = max(file_updates, key=file_updates.get)
